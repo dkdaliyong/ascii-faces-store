@@ -3,34 +3,65 @@ import './App.css';
 
 class App extends Component {
   state = {
+    page: 0,
     products: [],
+    loading: false,
+    apiError: false,
+    limitReached: false,
   };
 
   componentDidMount() {
-    const apiEnd = "http://localhost:3001/api/products";
-    fetch(apiEnd)
+    this.setState({ loading: true });
+
+    fetch('http://localhost:3001/api/products?_page=0&_limit=30')
       .then(resp => resp.json())
       .then(
         (result) => {
-          console.log('Success: ', result);
-          // this.setState({
-          //   isLoaded: true,
-          //   items: result.items
-          // });
+          this.setState({ loading: false });
+          this.setState({ products: [...result] });
         },
-        (error) => {
-          console.log('Error: ', error);
-          // this.setState({
-          //   isLoaded: true,
-          //   error
-          // });
+        () => {
+          this.setState({ loading: false, apiError: true });
         }
       )
   };
 
+  componentDidUpdate(_, prevState) {
+    if (this.state.page !== prevState.page) {
+      this.setState({ loading: true });
+
+      const apiEnd = 'http://localhost:3001/api/products?_page='+this.state.page+'&_limit=30';
+
+      fetch(apiEnd)
+        .then(resp => resp.json())
+        .then(
+          (result) => {
+            this.setState({ loading: false });
+            if (result.length > 0) {
+              this.setState({ products: [...this.state.products, ...result] });
+            } else {
+              this.setState({ limitReached: true });
+            }
+          },
+          () => {
+            this.setState({ loading: false, apiError: true });
+          }
+        )
+    }
+  };
+
   render() {
     return (
-      <div />
+      <div className="appContainer">
+        <button onClick={() => {
+          this.setState(prevState => {
+            return {page: prevState.page + 1}
+          });
+        }}>Button</button>
+        {this.state.loading && <p>Loading...</p>}
+        {this.state.limitReached && <p>End Reached...</p>}
+        {this.state.apiError && <p>Error: Please check your network connection and try again later.</p>}
+      </div>
     );
   }
 }
