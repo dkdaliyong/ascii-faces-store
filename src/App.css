@@ -1,31 +1,95 @@
 body {
   margin: 0;
-  padding: 0;
+  padding: 20px 10px;
+  box-sizing: border-box;
   font-family: sans-serif;
+  background-color: #fafafa;
 }
 
-.appContainer {
+p{
+  margin: 0;
+  padding: 0;
+}
+
+a{
+  text-decoration: none;
+}
+
+.appContainer{
   width: 100%;
-  max-width: 1200px;
+  max-width: 1000px;
   min-width: 320px;
+  margin: 0 auto;
+  padding: 0px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.title{
+  margin: 0;
+  padding: 20px 20px 0;
+  color: teal;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.welcomeMsg{
+  text-align: justify;
+  margin: 10px 0;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+.adContainer{
+  width: 100%;
+  margin: 0px;
   padding: 10px;
   box-sizing: border-box;
-  margin: 20px auto;
+}
+
+.ad{
+  width: 100%;
+  max-width: 320px;
+  margin: 10px auto;
+  display: block;
+}
+
+.productsContainer {
+  width: 100%;
+  height: 600px;
+  overflow-y: auto;
+  padding: 10px;
+  box-sizing: border-box;
+  margin: 0;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-around;
-  background-color: aquamarine;
+  background-color: #fff;
+  border: 2px solid #00cccc;
 }
 
-.productContainer {
+/* Scrollbar Style */
+.productsContainer::-webkit-scrollbar {
+  width: 6px;
+}
+.productsContainer::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+.productsContainer::-webkit-scrollbar-thumb {
+  background: #00b3b3; 
+}
+.productsContainer::-webkit-scrollbar-thumb:hover {
+  background: #008080; 
+}
+
+.itemContainer {
   width: 100%;
   max-width: 200px;
   min-width: 100px;
-  height: 100px;
   padding: 10px;
-  margin: 10px;
+  margin: 10px 5px;
   box-sizing: border-box;
-  background-color: bisque;
+  background-color: #e6ffff;
 }
