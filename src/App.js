@@ -6,16 +6,14 @@ import SortContainer from './components/Ui/SortContainer';
 import Loader from './components/Ui/Loader/Loader';
 import './App.css';
 
-// TODO: disable fetch if limit is reached
-
 export default class App extends Component {
   state = {
     page: 1,
     products: [],
     productsPrefetch: [],
     productsArePrefetched: true,
-    titleFace: '',
     sortBy: 'price',
+    advertisementId: null,
     loading: false,
     apiError: false,
     limitReached: false,
@@ -28,12 +26,21 @@ export default class App extends Component {
 
   componentDidUpdate(_, prevState) {
     if (this.state.sortBy !== prevState.sortBy) {
-      console.log('Sorting Changed.');
       this.loadProducts(this.state.sortBy);
     };
   };
 
+  loadAdvertisement = () => {
+    const newId = Math.floor(Math.random() * 1000);
+    if (this.state.advertisementId !== newId) {
+      this.setState({ advertisementId: newId });
+    } else {
+      this.loadAdvertisement();
+    };
+  };
+
   loadProducts = async (sortBy) => {
+    this.loadAdvertisement();
     this.setState({ loading: true, products: [] });
     const endpoint = 'http://localhost:3001/api/products?_page=1&_limit=20&_sort='+sortBy;
     try {
@@ -55,6 +62,7 @@ export default class App extends Component {
   };
 
   loadMoreProducts = () => {
+    this.loadAdvertisement();
     if (!this.state.limitReached) {
       this.setState({
         products: [...this.state.products, ...this.state.productsPrefetch],
@@ -84,6 +92,7 @@ export default class App extends Component {
         }, () => {
           if (this.state.bottomReached && this.state.productsArePrefetched) {
             this.loadMoreProducts();
+            // loadMoreProducts() is called if products are prefetched and the bottom is reached. Whichever condition was met last calls the loadMoreProducts().
           }
         });
       } else {
@@ -95,68 +104,32 @@ export default class App extends Component {
     }
   };
 
-  // preFetchApi = async (endpoint) => {
-  //   try {
-  //     const res = await fetch(endpoint);
-  //     const products = await res.json();
-  //     if (products.length > 0) {
-  //       this.setState({ productsPrefetch: [...products] });
-  //     } else {
-  //       this.setState({ limitReached: true });
-  //     }
-  //   } catch (e) {
-  //     this.setState({ apiError: true });
-  //     console.log('API Error: ', e);
-  //   }
-  // };
-
-  // fetchApi = async (endpoint, isNewSort) => {
-  //   try {
-  //     const res = await fetch(endpoint);
-  //     const products = await res.json();
-  //     if (products.length > 0) {
-  //       if (isNewSort) {
-  //         this.setState({ loading: false, products: [...products] });
-  //       } else {
-  //         this.setState({ loading: false, products: [...this.state.products, ...products] });
-  //       }
-  //     } else {
-  //       this.setState({ loading: false, limitReached: true });
-  //     }
-  //   } catch (e) {
-  //     this.setState({ loading: false, apiError: true });
-  //     console.log('API Error: ', e);
-  //   }
-  // };
-
   changeSortByHandler = sortBy => {
     this.setState({ sortBy });
+    // Products are reloaded in componentDidUpdate awaiting this sortBy state change
   };
 
   // This is the handler for when a user has reached the bottom of the products grid and load more items.
   // Admittedly, I got this from stackoverflow, but the idea is simple. By subtracting scrollTop (how much the user has scrolled down from the top) from scrollHeight (the element's whole height, including the hidden content), we'll get an idea of where the user is now currently scrolling on the list. If it reaches down to the container's height (600px in this case), we'll know the user has reached the bottom. We can have a trigger at that point, but it can also detect if a user is 100px or 200px from the bottom etc.
   onScroll = e => {
     const bottom = e.target.scrollHeight - e.target.scrollTop <= 600;
-    // if (bottom && !this.state.loading) {
-    //   this.setState(prevState => {
-    //     return {page: prevState.page + 1}
-    //   });
-    // }
+    
     if (bottom && !this.state.loading) {
       this.setState({ loading: true, bottomReached: true }, () => {
         if (this.state.bottomReached && this.state.productsArePrefetched) {
           this.loadMoreProducts();
+          // loadMoreProducts() is called if products are prefetched and the bottom is reached. Whichever condition was met last calls the loadMoreProducts().
         }
       });
     }
   }
 
   render() {
-    const { products, loading, limitReached, apiError } = this.state;
+    const { products, loading, limitReached, apiError, advertisementId } = this.state;
     return (
       <div className="appContainer">
         <HeaderTop />
-        <AdContainer />
+        <AdContainer advertisementId={advertisementId} />
         <SortContainer changeSortBy={this.changeSortByHandler} />
         <div className="productsContainer" onScroll={this.onScroll}>
           {products.map(product => {
@@ -172,16 +145,8 @@ export default class App extends Component {
           })}
           {loading && <Loader />}
           {limitReached && <p className="endReachedMessage">~ end of catalogue ~</p>}
+          {apiError && <p>Error: Please check your network connection and try again later.</p>}
         </div>
-        {/* <button
-          onClick={() => {
-            this.setState(prevState => {
-              return {page: prevState.page + 1}
-            });
-          }}
-          style={{ display: 'block' }}
-        >Button</button> */}
-        {apiError && <p>Error: Please check your network connection and try again later.</p>}
       </div>
     );
   }
