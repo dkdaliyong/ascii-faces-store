@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class Product extends Component {
+export default class Product extends Component {
   getDate = () => {
     const msec = Date.parse(this.props.date);
     const date = new Date(msec);
@@ -25,7 +25,9 @@ class Product extends Component {
     
     return (
       <div className="itemContainer">
-        <p>{this.props.face}</p>
+        <div className="faceContainer">
+          <p style={{ fontSize: this.props.size+'px' }}>{this.props.face}</p>
+        </div>
         <p>{this.getDate()}</p>
         <p>{this.props.price}</p>
         <p>{this.props.size}</p>
@@ -33,5 +35,3 @@ class Product extends Component {
     );
   }
 }
-
-export default Product;
