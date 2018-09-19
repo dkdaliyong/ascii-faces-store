@@ -130,16 +130,13 @@ export default class App extends Component {
       <div className="appContainer">
         <HeaderTop />
         <AdContainer advertisementId={advertisementId} />
-        <SortContainer changeSortBy={this.changeSortByHandler} />
+        <SortContainer changeSortBy={this.changeSortByHandler} active={this.state.sortBy} />
         <div className="productsContainer" onScroll={this.onScroll}>
           {products.map(product => {
             return (
               <Product
                 key={product.id}
-                date={product.date}
-                face={product.face}
-                price={product.price}
-                size={product.size}
+                product={product}
               />
             );
           })}
